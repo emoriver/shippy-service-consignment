@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  shippy-service-consignment:
+    container_name: shippy-service-consignment
+    image: shippy-service-consignment
+    build: .
+    ports:
+      - 50051

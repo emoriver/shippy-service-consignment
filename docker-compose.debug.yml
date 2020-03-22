@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  shippy-service-consignment:
+    image: shippy-service-consignment
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 50051
