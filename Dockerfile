@@ -1,30 +1,28 @@
 #build stage
-FROM golang:alpine AS builder
+FROM golang:1.13-alpine AS builder
 
-#aggiunto --bash perché non gestiva bene il recupero di "protoc-gen-go" 22/3/2020 ra
-RUN apk update && apk upgrade && \
-    apk add --no-cache git --upgrade bash
+RUN apk --no-cache add ca-certificates git 
 
-#aggiunti per progetto shippy 22/3/2020 ar
-RUN GO111MODULE=on \
-    go get google.golang.org/grpc \
-        github.com/golang/protobuf/protoc-gen-go
-
-RUN mkdir /app
-WORKDIR /app
-
+WORKDIR /go/src/shippy-service-consignment
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o shippy-service-consignment .
+RUN apk add --no-cache git 
+
+#RUN go get -d -v ./...
+RUN go get -d -v google.golang.org/grpc \
+    && wget https://github.com/protocolbuffers/protobuf/releases/download/v3.11.4/protoc-3.11.4-linux-x86_64.zip \
+    && unzip protoc-3.11.4-linux-x86_64.zip \
+    && go get -d -v github.com/golang/protobuf/protoc-gen-go
+
+#RUN go install -v ./...
+RUN go install -v main.go
 
 #final stage
 FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 
-RUN mkdir /app
-WORKDIR /app
-COPY --from=builder /app/shippy-service-consignment .
+COPY --from=builder /go/bin/shippy-service-consignment /shippy-service-consignment
+ENTRYPOINT ./shippy-service-consignment
 
 LABEL Name=shippy-service-consignment Version=0.0.1
-
-EXPOSE 50051
+EXPOSE 50001
