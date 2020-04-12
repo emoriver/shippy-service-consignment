@@ -1,28 +1,31 @@
-#build stage
-FROM golang:1.13-alpine AS builder
+FROM golang:1.13.8-alpine 
 
-RUN apk --no-cache add ca-certificates git 
-
-WORKDIR /go/src/shippy-service-consignment
+WORKDIR /workspaces/shippy-service-consignment
 COPY . .
 
-RUN apk add --no-cache git 
+RUN apk add --no-cache ca-certificates musl-dev gcc file git nano curl \
+    && apk update \
+    && apk upgrade \
+    && rm -rf /var/cache/apk/*
 
-#RUN go get -d -v ./...
-RUN go get -d -v google.golang.org/grpc \
+RUN GO111MODULE=on \
+    && go get golang.org/x/tools/gopls \
+    && go get github.com/go-delve/delve/cmd/dlv \    
+    && go get google.golang.org/grpc \
     && wget https://github.com/protocolbuffers/protobuf/releases/download/v3.11.4/protoc-3.11.4-linux-x86_64.zip \
     && unzip protoc-3.11.4-linux-x86_64.zip \
-    && go get -d -v github.com/golang/protobuf/protoc-gen-go
+    && go get github.com/golang/protobuf/protoc-gen-go \
+    && go get github.com/mdempsky/gocode \
+    && go get github.com/uudashr/gopkgs/v2/cmd/gopkgs \
+    && go get github.com/ramya-rao-a/go-outline \
+    && go get github.com/stamblerre/gocode \
+    && go get github.com/rogpeppe/godef \
+    && go get github.com/sqs/goreturns \
+    && go get golang.org/x/lint/golint
 
 #RUN go install -v ./...
-RUN go install -v main.go
+RUN go build -o main main.go
 
-#final stage
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
+EXPOSE 2345 50051
 
-COPY --from=builder /go/bin/shippy-service-consignment /shippy-service-consignment
-ENTRYPOINT ./shippy-service-consignment
-
-LABEL Name=shippy-service-consignment Version=0.0.1
-EXPOSE 50001
+CMD ["./main"]

@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceRoot}",
+            "env": {},
+            "args": [],
+            "showLog": true
+        },
+        {
+            "name": "Delve into Docker",
+            "type": "go",
+            "request": "launch",
+            "mode": "remote",
+            "program": "${workspaceRoot}",
+            "env": {},
+            "args": [],
+            "showLog": true,
+            "remotePath": "/workspaces/shippy-service-consignment",
+            "port": 2345,
+            "host": "127.0.0.1"
+      }
+    ]
+}
