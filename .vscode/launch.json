@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch",
+            "name": "Local",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -12,7 +12,7 @@
             "showLog": true
         },
         {
-            "name": "Delve into Docker",
+            "name": "Docker",
             "type": "go",
             "request": "launch",
             "mode": "remote",
